@@ -1,0 +1,28 @@
+{
+  "name": "spps",
+  "version": "1.0.0",
+  "description": "Simple Password Protection Solution for NPM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elomagic/spps-npm.git"
+  },
+  "keywords": [
+    "encrypt",
+    "decrypt",
+    "password",
+    "security"
+  ],
+  "author": "Carsten Rambow",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/elomagic/spps-npm/issues"
+  },
+  "homepage": "https://github.com/elomagic/spps-npm#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0"
+  }
+}
