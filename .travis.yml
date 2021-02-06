@@ -1,0 +1,20 @@
+# Disable sudo to speed up the build
+sudo: false
+
+language: node_js
+
+python:
+  - "15.1"
+
+# Run the unit test
+script:
+  - echo 'Installing dependencies'
+  - npm install
+  - echo 'Running tests'
+  - mocha
+
+# Enable cache
+cache: npm
+
+after_success:
+  - coveralls
