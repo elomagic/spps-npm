@@ -3,7 +3,7 @@ sudo: false
 
 language: node_js
 
-python:
+node_js:
   - "15.7"
 
 # Run the unit test
