@@ -73,8 +73,8 @@ function encrypt(value) {
 
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
-    let buf = Buffer.concat([iv, Buffer.from(cipher.update(value, 'utf8', 'binary'))]);
-    buf = Buffer.concat([buf, Buffer.from(cipher.final('binary'))]);
+    let buf = Buffer.concat([iv, cipher.update(value, 'utf8')]);
+    buf = Buffer.concat([buf, cipher.final()]);
     buf = Buffer.concat([buf, cipher.getAuthTag()]);
 
     return "{" + buf.toString("base64") + "}";
@@ -106,7 +106,7 @@ function decryptString(encapsulatedEncryptedData) {
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(tag);
-    let dec = decipher.update(data, 'hex', 'utf8')
+    let dec = decipher.update(data, 'binary', 'utf8')
     dec += decipher.final('utf8');
     return dec;
 }

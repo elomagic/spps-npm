@@ -11,7 +11,7 @@ script:
   - echo 'Installing dependencies'
   - npm install
   - echo 'Running tests'
-  - mocha
+  - npm test
 
 # Enable cache
 cache: npm
