@@ -4,7 +4,7 @@
   "description": "Simple Password Protection Solution for Node.js",
   "main": "spps.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
