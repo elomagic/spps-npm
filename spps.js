@@ -22,9 +22,10 @@
 
 const fs = require('fs');
 const crypto = require('crypto');
+const os = require('os');
 
 const ALGORITHM = 'aes-256-gcm'
-const MASTER_FILE_PATH = process.env.USERPROFILE + "/.spps/";
+const MASTER_FILE_PATH = os.homedir() + "/.spps/";
 const MASTER_FILE = MASTER_FILE_PATH + "masterkey";
 
 /**

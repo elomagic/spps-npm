@@ -8,9 +8,7 @@ node_js:
 
 # Run the unit test
 script:
-  - echo 'Installing dependencies'
   - npm install
-  - echo 'Running tests'
   - npm test
 
 # Enable cache
