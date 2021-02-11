@@ -28,6 +28,71 @@ const ALGORITHM = 'aes-256-gcm'
 const MASTER_FILE_PATH = os.homedir() + "/.spps/";
 const MASTER_FILE = MASTER_FILE_PATH + "masterkey";
 
+function readProperty(file, key) {
+    // read contents of the file
+    const data = fs.readFileSync(file, 'UTF-8');
+
+    // split the contents by new line
+    const lines = data.split(/\r?\n/);
+
+    let result = null;
+
+    // print all lines
+    lines.forEach((line) => {
+        if (line.startsWith(key + "=")) {
+            result = line.substring(key.length + 1).trim();
+        }
+    });
+
+    return result;
+}
+
+function readMasterKey(file = MASTER_FILE) {
+    if (!fs.existsSync(file)) {
+        throw new Error("Unable to find settings file. At first you have to create a master key.");
+    }
+
+    let relocation = readProperty(file, "relocation")
+
+    if (relocation.length === 0) {
+        return Buffer.from(readProperty(file, "key"), 'base64');
+    } else {
+        return readMasterKey(Paths.get(p.getProperty(RELOCATION_KEY)));
+    }
+}
+
+/**
+ * Creates a new master key.
+ *
+ * @param force Must true to confirm to overwrite existing master key.
+ * @throws GeneralSecurityException Thrown when unable to create master key
+ */
+function createMasterKey(force) {
+    _createMasterKey(MASTER_FILE, force,null);
+}
+
+function _createMasterKey(file, force, relocationFile) {
+    if (fs.existsSync(file) && !force) {
+        throw new Error("Master key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
+    }
+
+    // TODO Fix it
+    if (!fs.existsSync(MASTER_FILE_PATH)){
+        fs.mkdirSync(MASTER_FILE_PATH);
+    }
+
+    let lines;
+
+    if (relocationFile == null || file.equals(relocationFile)) {
+        lines = "key=" + crypto.randomBytes(32).toString('base64') + "\nrelocation=\n";
+    } else {
+        lines = "key=\nrelocation=" + relocationFile + "\n";
+        _createMasterKey(relocationFile, force, null);
+    }
+
+    fs.writeFileSync(file, lines, { encoding: "utf-8"} );
+}
+
 /**
  * Returns true when value is encrypted, tagged by surrounding braces "{" and "}".
  *
@@ -36,26 +101,6 @@ const MASTER_FILE = MASTER_FILE_PATH + "masterkey";
  */
 function isEncryptedValue(value) {
     return value != null && value.startsWith('{') && value.endsWith("}");
-}
-
-function readMasterKey() {
-    let key
-
-    if (fs.existsSync(MASTER_FILE)) {
-        const base64data = fs.readFileSync(MASTER_FILE, 'utf8')
-        key = Buffer.from(base64data, 'base64');
-    } else {
-        if (!fs.existsSync(MASTER_FILE_PATH)){
-            fs.mkdirSync(MASTER_FILE_PATH);
-        }
-
-        key = crypto.randomBytes(32);
-        let base64 = key.toString('base64');
-
-        fs.writeFileSync(MASTER_FILE, base64, { encoding: "ascii"} );
-    }
-
-    return key
 }
 
 /**
@@ -114,6 +159,7 @@ function decryptString(encapsulatedEncryptedData) {
 
 module.exports = {
     isEncryptedValue,
+    createMasterKey,
     encrypt,
     decryptString
 };
