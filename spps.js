@@ -25,8 +25,8 @@ const crypto = require('crypto');
 const os = require('os');
 
 const ALGORITHM = 'aes-256-gcm'
-const MASTER_FILE_PATH = os.homedir() + "/.spps/";
-const MASTER_FILE = MASTER_FILE_PATH + "masterkey";
+const PRIVATE_FILE_PATH = os.homedir() + "/.spps/";
+const PRIVATE_FILE = PRIVATE_FILE_PATH + "settings";
 
 function readProperty(file, key) {
     // read contents of the file
@@ -47,9 +47,9 @@ function readProperty(file, key) {
     return result;
 }
 
-function readMasterKey(file = MASTER_FILE) {
+function readPrivateKey(file = PRIVATE_FILE) {
     if (!fs.existsSync(file)) {
-        throw new Error("Unable to find settings file. At first you have to create a master key.");
+        throw new Error("Unable to find settings file. At first you have to create a private key.");
     }
 
     let relocation = readProperty(file, "relocation")
@@ -57,28 +57,28 @@ function readMasterKey(file = MASTER_FILE) {
     if (relocation.length === 0) {
         return Buffer.from(readProperty(file, "key"), 'base64');
     } else {
-        return readMasterKey(Paths.get(p.getProperty(RELOCATION_KEY)));
+        return readPrivateKey(Paths.get(p.getProperty(RELOCATION_KEY)));
     }
 }
 
 /**
- * Creates a new master key.
+ * Creates a new private key.
  *
- * @param force Must true to confirm to overwrite existing master key.
- * @throws GeneralSecurityException Thrown when unable to create master key
+ * @param force Must true to confirm to overwrite existing private key.
+ * @throws GeneralSecurityException Thrown when unable to create private key
  */
-function createMasterKey(force) {
-    _createMasterKey(MASTER_FILE, force,null);
+function createPrivateKey(force) {
+    _createPrivateKey(PRIVATE_FILE, force,null);
 }
 
-function _createMasterKey(file, force, relocationFile) {
+function _createPrivateKey(file, force, relocationFile) {
     if (fs.existsSync(file) && !force) {
-        throw new Error("Master key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
+        throw new Error("Private key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
     }
 
     // TODO Fix it
-    if (!fs.existsSync(MASTER_FILE_PATH)){
-        fs.mkdirSync(MASTER_FILE_PATH);
+    if (!fs.existsSync(PRIVATE_FILE_PATH)){
+        fs.mkdirSync(PRIVATE_FILE_PATH);
     }
 
     let lines;
@@ -87,7 +87,7 @@ function _createMasterKey(file, force, relocationFile) {
         lines = "key=" + crypto.randomBytes(32).toString('base64') + "\nrelocation=\n";
     } else {
         lines = "key=\nrelocation=" + relocationFile + "\n";
-        _createMasterKey(relocationFile, force, null);
+        _createPrivateKey(relocationFile, force, null);
     }
 
     fs.writeFileSync(file, lines, { encoding: "utf-8"} );
@@ -114,7 +114,7 @@ function encrypt(value) {
         return null;
     }
 
-    const key = readMasterKey();
+    const key = readPrivateKey();
     const iv = crypto.randomBytes(16);
 
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
@@ -144,7 +144,7 @@ function decryptString(encapsulatedEncryptedData) {
     const base64encryptedData = encapsulatedEncryptedData.substring(1, encapsulatedEncryptedData.length-1);
     const encryptedData = Buffer.from(base64encryptedData, 'base64');
 
-    const key = readMasterKey();
+    const key = readPrivateKey();
 
     const iv = encryptedData.subarray(0, 16); // Get Initialization vector.
     const data = encryptedData.subarray(16, encryptedData.length-16);
@@ -159,7 +159,7 @@ function decryptString(encapsulatedEncryptedData) {
 
 module.exports = {
     isEncryptedValue,
-    createMasterKey,
+    createPrivateKey,
     encrypt,
     decryptString
 };
