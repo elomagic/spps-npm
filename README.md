@@ -28,7 +28,7 @@ A symmetrical encryption based on the AES-GCM 256 method is used. See also https
 
 The private key is stored in a file ```"/.spps/settings"``` of the user home folder.
 
-Note that anyone who has access to the user home folder also has access to the private key !!!!
+Keep in mind that anyone who has access to the user home or relocation folder also has access to the private key !!!!
 
 ## Example
 
@@ -41,3 +41,57 @@ console.log("My encrypted secret is " + encryptedSecret);
 let secret = spps.decryptString(encryptedSecret)
 console.log("...and my secret is " + secret);
 ```
+
+## How to create a private key
+
+### Create a private in your home folder:
+
+Enter following command in your terminal:
+
+```bash
+node ...
+```
+
+The settings file ```'~/.spps/settings'``` in your home folder will look like:
+
+```properties
+key=5C/Yi6+hbgRwIBhXT9PQGi83EVw2Oe6uttRSl4/kLzc=
+relocation=
+```
+
+### Alternative, create a private key on a removable device:
+
+Enter following command in your terminal:
+
+```bash
+node ...
+```
+
+The settings file ```'~/.spps/settings'``` in your home folder will look like:
+
+```properties
+key=
+relocation=/Volumes/usb-stick
+```
+
+...and in the relocation folder look like:
+
+```properties
+key=5C/Yi6+hbgRwIBhXT9PQGi83EVw2Oe6uttRSl4/kLzc=
+relocation=
+```
+
+## How to create an encrypted password
+
+Enter following command in your terminal:
+
+```bash
+node ... 
+```
+
+Output should look like:
+```
+{MLaFzwpNyKJbJSCg4xY5g70WDAKnOhVe3oaaDAGWtH4KXR4=}
+```
+
+##
